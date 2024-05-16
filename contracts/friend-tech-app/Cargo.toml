@@ -1,11 +1,7 @@
 [package]
-name = "my-adapter"
+name = "friend-tech-app"
 version = "0.0.1"
-authors = [
-  "CyberHoward <cyberhoward@protonmail.com>",
-  "Adair <adair@abstract.money>",
-  "Abstract Money <contact@abstract.money>",
-]
+authors = ["luc", "boc"]
 edition = "2021"
 homepage = ""
 documentation = ""
@@ -26,17 +22,18 @@ required-features = ["schema"]
 [features]
 default = ["export"]
 export = []
-schema = ["abstract-adapter/schema"]
+schema = ["abstract-app/schema"]
 
 [dependencies]
 cosmwasm-std = { workspace = true }
 cosmwasm-schema = { workspace = true }
 cw-controllers = { workspace = true }
 cw-storage-plus = { workspace = true }
+cw-utils = { workspace = true }
 thiserror = { workspace = true }
 schemars = { workspace = true }
 cw-asset = { workspace = true }
-abstract-adapter = { workspace = true }
+abstract-app = { workspace = true }
 const_format = { workspace = true }
 
 # Dependencies for interface
@@ -44,9 +41,10 @@ cw-orch = { workspace = true }
 abstract-interface = { workspace = true }
 
 [dev-dependencies]
-my-adapter = { workspace = true }
+friend-tech-app = { workspace = true }
+
 abstract-client = { workspace = true }
-abstract-adapter = { workspace = true, features = ["test-utils"] }
+abstract-app = { workspace = true, features = ["test-utils"] }
 speculoos = { workspace = true }
 semver = { workspace = true }
 dotenv = { workspace = true }

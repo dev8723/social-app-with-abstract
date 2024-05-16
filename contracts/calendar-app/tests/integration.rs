@@ -1,4 +1,4 @@
-use my_app::{
+use calendar_app::{
     contract::interface::MyAppInterface,
     msg::{
         ConfigResponse, CountResponse, MyAppExecuteMsgFns, MyAppInstantiateMsg, MyAppQueryMsgFns,
@@ -100,7 +100,7 @@ fn update_config() -> anyhow::Result<()> {
 
     app.update_config()?;
     let config = app.config()?;
-    let expected_response = my_app::msg::ConfigResponse {};
+    let expected_response = calendar_app::msg::ConfigResponse {};
     assert_eq!(config, expected_response);
     Ok(())
 }

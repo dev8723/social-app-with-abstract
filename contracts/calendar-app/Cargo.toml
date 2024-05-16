@@ -1,11 +1,7 @@
 [package]
-name = "my-app"
+name = "calendar-app"
 version = "0.0.1"
-authors = [
-  "CyberHoward <cyberhoward@protonmail.com>",
-  "Adair <adair@abstract.money>",
-  "Abstract Money <contact@abstract.money>",
-]
+authors = ["luc", "boc"]
 edition = "2021"
 homepage = ""
 documentation = ""
@@ -44,7 +40,8 @@ cw-orch = { workspace = true }
 abstract-interface = { workspace = true }
 
 [dev-dependencies]
-my-app = { workspace = true }
+calendar-app = { workspace = true }
+
 abstract-client = { workspace = true }
 abstract-app = { workspace = true, features = ["test-utils"] }
 speculoos = { workspace = true }

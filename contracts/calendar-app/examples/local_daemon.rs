@@ -7,12 +7,12 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --example local_daemon --package my-app`
-use my_app::MY_APP_ID;
+use calendar_app::MY_APP_ID;
 
 use abstract_app::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};
+use calendar_app::{msg::MyAppInstantiateMsg, MyAppInterface, APP_VERSION};
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
-use my_app::{msg::MyAppInstantiateMsg, MyAppInterface, APP_VERSION};
 use semver::Version;
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";
@@ -57,7 +57,7 @@ fn main() -> anyhow::Result<()> {
     let app = account.install_app::<MyAppInterface<_>>(&MyAppInstantiateMsg { count: 0 }, &[])?;
 
     // Import app's endpoint function traits for easy interactions.
-    use my_app::msg::{MyAppExecuteMsgFns, MyAppQueryMsgFns};
+    use calendar_app::msg::{MyAppExecuteMsgFns, MyAppQueryMsgFns};
     assert_eq!(app.count()?.count, 0);
     // Execute the App
     app.increment()?;
