@@ -34,16 +34,10 @@ pub enum FriendTechAppError {
     AccountOwnerMustBeSetToIssueKey {},
 
     #[error("Insufficient funds, required: {required}, paid: {paid}")]
-    InsufficientFunds {
-        required: Uint128,
-        paid: Uint128,
-    },
+    InsufficientFunds { required: Uint128, paid: Uint128 },
 
     #[error("Cannot sell more than owned, owned: {owned}, to sell: {to_sell}")]
-    CannotSellMoreThanOwned {
-        owned: Uint128,
-        to_sell: Uint128,
-    },
+    CannotSellMoreThanOwned { owned: Uint128, to_sell: Uint128 },
 
     #[error("Issuer cannot sell last key")]
     IssuerCannotSellLastKey {},

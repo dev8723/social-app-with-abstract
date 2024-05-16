@@ -91,7 +91,7 @@ fn sell_key(
     let old_amount = HOLDERS.load(deps.storage, seller)?;
 
     if amount <= old_amount {
-        if seller == issuer_addr && amount == amount {
+        if seller == issuer_addr && amount == old_amount {
             return Err(FriendTechAppError::IssuerCannotSellLastKey {});
         }
     } else {
