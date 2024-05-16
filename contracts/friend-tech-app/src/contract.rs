@@ -6,7 +6,7 @@ use crate::{
         FriendTechAppQueryMsg,
     },
     replies::{self, INSTANTIATE_REPLY_ID},
-    APP_VERSION, MY_APP_ID,
+    APP_VERSION, FRIEND_TECH_APP_ID,
 };
 
 use abstract_app::AppContract;
@@ -24,7 +24,7 @@ pub type FriendTechApp = AppContract<
     FriendTechAppMigrateMsg,
 >;
 
-const APP: FriendTechApp = FriendTechApp::new(MY_APP_ID, APP_VERSION, None)
+const APP: FriendTechApp = FriendTechApp::new(FRIEND_TECH_APP_ID, APP_VERSION, None)
     .with_instantiate(handlers::instantiate_handler)
     .with_execute(handlers::execute_handler)
     .with_query(handlers::query_handler)

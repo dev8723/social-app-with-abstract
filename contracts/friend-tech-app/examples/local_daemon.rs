@@ -8,7 +8,7 @@
 //!
 //! `RUST_LOG=info cargo run --example local_daemon --package my-app`
 use cosmwasm_std::Uint128;
-use friend_tech_app::MY_APP_ID;
+use friend_tech_app::FRIEND_TECH_APP_ID;
 
 use abstract_app::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};
@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
         .build()
         .unwrap();
 
-    let app_namespace = Namespace::from_id(MY_APP_ID)?;
+    let app_namespace = Namespace::from_id(FRIEND_TECH_APP_ID)?;
 
     // Create an [`AbstractClient`]
     // Note: AbstractClient Builder used because Abstract is not yet deployed on the chain
@@ -65,7 +65,7 @@ fn main() -> anyhow::Result<()> {
     )?;
 
     // Import app's endpoint function traits for easy interactions.
-    use friend_tech_app::msg::{FriendTechAppExecuteMsgFns, FriendTechAppQueryMsgFns};
+    use friend_tech_app::msg::FriendTechAppQueryMsgFns;
     assert_eq!(app.issuer()?.supply, Uint128::zero());
     // Execute the App
     // app.increment()?;

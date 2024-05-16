@@ -39,4 +39,3 @@ clap = { version = "4.3.7" }
 
 # my contracts
 friend-tech-app = { path = "contracts/friend-tech-app" }
-calendar-app = { path = "contracts/calendar-app" }

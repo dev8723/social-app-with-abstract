@@ -7,7 +7,7 @@
 //! ```bash
 //! $ just publish uni-6 osmo-test-5
 //! ```
-use friend_tech_app::MY_APP_ID;
+use friend_tech_app::FRIEND_TECH_APP_ID;
 
 use abstract_app::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};
@@ -25,7 +25,7 @@ fn publish(networks: Vec<ChainInfo>) -> anyhow::Result<()> {
             .chain(network)
             .build()?;
 
-        let app_namespace = Namespace::from_id(MY_APP_ID)?;
+        let app_namespace = Namespace::from_id(FRIEND_TECH_APP_ID)?;
 
         // Create an [`AbstractClient`]
         let abstract_client: AbstractClient<Daemon> = AbstractClient::new(chain.clone())?;
