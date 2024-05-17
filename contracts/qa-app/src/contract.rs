@@ -44,7 +44,10 @@ impl<Chain: cw_orch::environment::CwEnv> abstract_interface::DependencyCreation
 
     fn dependency_install_configs(
         configuration: Self::DependenciesConfig,
-    ) -> Result<Vec<abstract_app::std::manager::ModuleInstallConfig>, abstract_interface::AbstractInterfaceError> {
+    ) -> Result<
+        Vec<abstract_app::std::manager::ModuleInstallConfig>,
+        abstract_interface::AbstractInterfaceError,
+    > {
         let friend_tech_dependency_install_configs: Vec<abstract_app::std::manager::ModuleInstallConfig> =
             <friend_tech_app::Friendtech<Chain> as abstract_interface::DependencyCreation>::dependency_install_configs(
                 cosmwasm_std::Empty {},
