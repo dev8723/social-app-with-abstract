@@ -1,5 +1,3 @@
-#![allow(unused_imports)]
-
 use crate::{
     error::QAAppError,
     handlers,
@@ -8,14 +6,9 @@ use crate::{
     APP_VERSION, QA_APP_ID,
 };
 
-use abstract_app::{
-    objects::dependency::StaticDependency, std::manager::ModuleInstallConfig, AppContract,
-};
-use abstract_interface::{AbstractInterfaceError, DependencyCreation, InstallConfig};
+use abstract_app::{objects::dependency::StaticDependency, AppContract};
 use cosmwasm_std::Response;
-use friend_tech_app::{
-    msg::FriendTechAppInstantiateMsg, Friendtech, FRIEND_TECH_APP_ID, FRIEND_TECH_APP_VERSION,
-};
+use friend_tech_app::{FRIEND_TECH_APP_ID, FRIEND_TECH_APP_VERSION};
 
 /// The type of the result returned by your app's entry points.
 pub type QAAppResult<T = Response> = Result<T, QAAppError>;
@@ -47,24 +40,25 @@ abstract_app::cw_orch_interface!(QA_APP, QAApp, Qa);
 impl<Chain: cw_orch::environment::CwEnv> abstract_interface::DependencyCreation
     for crate::Qa<Chain>
 {
-    type DependenciesConfig = FriendTechAppInstantiateMsg;
+    type DependenciesConfig = friend_tech_app::msg::FriendTechAppInstantiateMsg;
 
     fn dependency_install_configs(
         configuration: Self::DependenciesConfig,
-    ) -> Result<Vec<ModuleInstallConfig>, AbstractInterfaceError> {
-        let friend_tech_dependency_install_configs: Vec<ModuleInstallConfig> =
-            <Friendtech<Chain> as DependencyCreation>::dependency_install_configs(
+    ) -> Result<Vec<abstract_app::std::manager::ModuleInstallConfig>, abstract_interface::AbstractInterfaceError> {
+        let friend_tech_dependency_install_configs: Vec<abstract_app::std::manager::ModuleInstallConfig> =
+            <friend_tech_app::Friendtech<Chain> as abstract_interface::DependencyCreation>::dependency_install_configs(
                 cosmwasm_std::Empty {},
             )?;
 
-        let friend_tech_install_config = <Friendtech<Chain> as InstallConfig>::install_config(
-            // &friend_tech_app::msg::FriendTechAppInstantiateMsg {
-            //     username: "test_user",
-            //     issuer_fee_collector: todo!(),
-            //     fee_denom: todo!(),
-            // },
-            &configuration,
-        )?;
+        let friend_tech_install_config =
+            <friend_tech_app::Friendtech<Chain> as abstract_interface::InstallConfig>::install_config(
+                // &friend_tech_app::msg::FriendTechAppInstantiateMsg {
+                //     username: "test_user",
+                //     issuer_fee_collector: todo!(),
+                //     fee_denom: todo!(),
+                // },
+                &configuration,
+            )?;
 
         Ok([
             friend_tech_dependency_install_configs,
