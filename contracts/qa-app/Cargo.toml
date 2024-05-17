@@ -1,0 +1,56 @@
+[package]
+name = "qa-app"
+version = "0.0.1"
+authors = ["luc", "boc"]
+edition = "2021"
+homepage = ""
+documentation = ""
+repository = ""
+license = "GPL-3.0-or-later"
+keywords = ["cosmos", "cosmwasm", "abstractsdk"]
+resolver = "2"
+
+exclude = ["contract.wasm", "hash.txt"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[example]]
+name = "schema"
+required-features = ["schema"]
+
+[features]
+default = ["export"]
+export = []
+schema = ["abstract-app/schema"]
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cw-controllers = { workspace = true }
+cw-storage-plus = { workspace = true }
+cw-utils = { workspace = true }
+thiserror = { workspace = true }
+schemars = { workspace = true }
+cw-asset = { workspace = true }
+abstract-app = { workspace = true }
+const_format = { workspace = true }
+
+# Dependencies for interface
+cw-orch = { workspace = true }
+abstract-interface = { workspace = true }
+
+# Abstract module dependencies
+friend-tech-app = { workspace = true }
+
+[dev-dependencies]
+qa-app = { workspace = true }
+
+abstract-client = { workspace = true }
+abstract-app = { workspace = true, features = ["test-utils"] }
+speculoos = { workspace = true }
+semver = { workspace = true }
+dotenv = { workspace = true }
+env_logger = { workspace = true }
+cw-orch = { workspace = true, features = ["daemon"] }
+clap = { workspace = true, features = ["derive"] }

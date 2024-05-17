@@ -41,7 +41,7 @@ pub fn multiply_percentage(price: Uint128, percentage: u32) -> Uint128 {
     (price * Uint128::from(percentage)) / Uint128::from(100_u64)
 }
 
-pub fn get_issuer_addr(deps: Deps, app: &FriendTechApp) -> Result<Addr, FriendTechAppError> {
+pub fn get_account_owner_addr(deps: Deps, app: &FriendTechApp) -> Result<Addr, FriendTechAppError> {
     let issuer = app.admin.query_account_owner(deps)?.admin;
     match issuer {
         Some(addr) => Ok(deps.api.addr_validate(&addr)?),

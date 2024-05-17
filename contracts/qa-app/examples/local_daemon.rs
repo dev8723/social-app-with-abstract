@@ -7,13 +7,12 @@
 //! # Run
 //!
 //! `RUST_LOG=info cargo run --example local_daemon --package my-app`
-use cosmwasm_std::Uint128;
-use friend_tech_app::FRIEND_TECH_APP_ID;
+use qa_app::QA_APP_ID;
 
 use abstract_app::objects::namespace::Namespace;
 use abstract_client::{AbstractClient, Publisher};
 use cw_orch::{anyhow, prelude::*, tokio::runtime::Runtime};
-use friend_tech_app::{msg::FriendTechAppInstantiateMsg, Friendtech, FRIEND_TECH_APP_VERSION};
+use qa_app::{msg::QAAppInstantiateMsg, Qa, APP_VERSION};
 use semver::Version;
 
 const LOCAL_MNEMONIC: &str = "clip hire initial neck maid actor venue client foam budget lock catalog sweet steak waste crater broccoli pipe steak sister coyote moment obvious choose";
@@ -22,7 +21,7 @@ fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
 
-    let _version: Version = FRIEND_TECH_APP_VERSION.parse().unwrap();
+    let _version: Version = APP_VERSION.parse().unwrap();
     let runtime = Runtime::new()?;
 
     let daemon = Daemon::builder()
@@ -32,7 +31,7 @@ fn main() -> anyhow::Result<()> {
         .build()
         .unwrap();
 
-    let app_namespace = Namespace::from_id(FRIEND_TECH_APP_ID)?;
+    let app_namespace = Namespace::from_id(QA_APP_ID)?;
 
     // Create an [`AbstractClient`]
     // Note: AbstractClient Builder used because Abstract is not yet deployed on the chain
@@ -49,24 +48,17 @@ fn main() -> anyhow::Result<()> {
     }
 
     // Publish the App to the Abstract Platform
-    publisher.publish_app::<Friendtech<Daemon>>()?;
+    publisher.publish_app::<Qa<Daemon>>()?;
 
     // Install the App on a new account
 
     let account = abstract_client.account_builder().build()?;
     // Installs the app on the Account
-    let app = account.install_app::<Friendtech<_>>(
-        &FriendTechAppInstantiateMsg {
-            username: "test".to_string(),
-            issuer_fee_collector: daemon.sender().to_string(),
-            fee_denom: "ucosm".to_string(),
-        },
-        &[],
-    )?;
+    let app = account.install_app::<Qa<_>>(&QAAppInstantiateMsg {}, &[])?;
 
     // Import app's endpoint function traits for easy interactions.
-    use friend_tech_app::msg::FriendTechAppQueryMsgFns;
-    assert_eq!(app.issuer()?.supply, Uint128::zero());
+    use qa_app::msg::QAAppQueryMsgFns;
+    assert_eq!(app.stats()?.total_question_count, 0);
     // Execute the App
     // app.increment()?;
 

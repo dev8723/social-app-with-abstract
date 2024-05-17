@@ -1,8 +1,8 @@
 use crate::{
     contract::{FriendTechApp, FriendTechAppResult},
     msg::{
-        FriendTechAppQueryMsg, HoldersResponse, HoldingResponse, IssuerResponse,
-        SimulateBuyKeyResponse, SimulateSellKeyResponse,
+        BuyKeyCostResponse, FriendTechAppQueryMsg, HoldersResponse, HoldingResponse,
+        IssuerResponse, SellKeyCostResponse,
     },
     state::{CONFIG, HOLDERS, SUPPLY},
     utils::{calculate_buy_price, calculate_sell_price, multiply_percentage},
@@ -24,11 +24,11 @@ pub fn query_handler(
 ) -> FriendTechAppResult<Binary> {
     match msg {
         FriendTechAppQueryMsg::Issuer {} => to_json_binary(&query_issuer(deps)?),
-        FriendTechAppQueryMsg::SimulateBuyKey { amount } => {
-            to_json_binary(&query_simulate_buy_key(deps, amount)?)
+        FriendTechAppQueryMsg::BuyKeyCost { amount } => {
+            to_json_binary(&query_buy_key_cost(deps, amount)?)
         }
-        FriendTechAppQueryMsg::SimulateSellKey { amount } => {
-            to_json_binary(&query_simulate_sell_key(deps, amount)?)
+        FriendTechAppQueryMsg::SellKeyCost { amount } => {
+            to_json_binary(&query_sell_key_cost(deps, amount)?)
         }
         FriendTechAppQueryMsg::Holders { limit, start_after } => {
             to_json_binary(&query_holders(deps, limit, start_after)?)
@@ -49,22 +49,22 @@ fn query_issuer(deps: Deps) -> StdResult<IssuerResponse> {
     })
 }
 
-pub fn query_simulate_buy_key(deps: Deps, amount: Uint128) -> StdResult<SimulateBuyKeyResponse> {
+pub fn query_buy_key_cost(deps: Deps, amount: Uint128) -> StdResult<BuyKeyCostResponse> {
     let old_supply = SUPPLY.load(deps.storage)?;
     let price = calculate_buy_price(old_supply, amount);
     let issuer_fee = multiply_percentage(price, ISSUER_FEE_PERCENTAGE);
-    Ok(SimulateBuyKeyResponse {
+    Ok(BuyKeyCostResponse {
         price,
         issuer_fee,
         total_cost: price + issuer_fee,
     })
 }
 
-pub fn query_simulate_sell_key(deps: Deps, amount: Uint128) -> StdResult<SimulateSellKeyResponse> {
+pub fn query_sell_key_cost(deps: Deps, amount: Uint128) -> StdResult<SellKeyCostResponse> {
     let old_supply = SUPPLY.load(deps.storage)?;
     let price = calculate_sell_price(old_supply - amount, amount);
     let issuer_fee = multiply_percentage(price, ISSUER_FEE_PERCENTAGE);
-    Ok(SimulateSellKeyResponse {
+    Ok(SellKeyCostResponse {
         price,
         issuer_fee,
         total_cost: issuer_fee,

@@ -40,10 +40,10 @@ pub struct FriendTechAppMigrateMsg {}
 pub enum FriendTechAppQueryMsg {
     #[returns(IssuerResponse)]
     Issuer {},
-    #[returns(SimulateBuyKeyResponse)]
-    SimulateBuyKey { amount: Uint128 },
-    #[returns(SimulateSellKeyResponse)]
-    SimulateSellKey { amount: Uint128 },
+    #[returns(BuyKeyCostResponse)]
+    BuyKeyCost { amount: Uint128 },
+    #[returns(SellKeyCostResponse)]
+    SellKeyCost { amount: Uint128 },
     #[returns(HoldersResponse)]
     Holders {
         limit: Option<u32>,
@@ -62,7 +62,7 @@ pub struct IssuerResponse {
 }
 
 #[cosmwasm_schema::cw_serde]
-pub struct SimulateBuyKeyResponse {
+pub struct BuyKeyCostResponse {
     /// Price of buying amount of key
     pub price: Uint128,
     /// Fee charged by the issuer
@@ -72,7 +72,7 @@ pub struct SimulateBuyKeyResponse {
 }
 
 #[cosmwasm_schema::cw_serde]
-pub struct SimulateSellKeyResponse {
+pub struct SellKeyCostResponse {
     /// Price of selling amount of key
     pub price: Uint128,
     /// Fee charged by the issuer

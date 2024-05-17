@@ -1,5 +1,5 @@
 use friend_tech_app::{
-    contract::interface::FriendTechAppInterface,
+    contract::interface::Friendtech,
     msg::{
         FriendTechAppExecuteMsgFns, FriendTechAppInstantiateMsg, FriendTechAppQueryMsgFns,
         HoldersResponse, IssuerResponse,
@@ -19,7 +19,7 @@ const USER1: &str = "user1";
 
 struct TestEnv<Env: CwEnv> {
     abs: AbstractClient<Env>,
-    app: Application<Env, FriendTechAppInterface<Env>>,
+    app: Application<Env, Friendtech<Env>>,
 }
 
 impl TestEnv<MockBech32> {
@@ -36,18 +36,16 @@ impl TestEnv<MockBech32> {
 
         // Publish the app
         let publisher = abs_client.publisher_builder(namespace).build()?;
-        publisher.publish_app::<FriendTechAppInterface<_>>()?;
+        publisher.publish_app::<Friendtech<_>>()?;
 
-        let app = publisher
-            .account()
-            .install_app::<FriendTechAppInterface<_>>(
-                &FriendTechAppInstantiateMsg {
-                    username: "test".to_string(),
-                    fee_denom: DENOM.to_string(),
-                    issuer_fee_collector: sender.to_string(),
-                },
-                &[],
-            )?;
+        let app = publisher.account().install_app::<Friendtech<_>>(
+            &FriendTechAppInstantiateMsg {
+                username: "test".to_string(),
+                fee_denom: DENOM.to_string(),
+                issuer_fee_collector: sender.to_string(),
+            },
+            &[],
+        )?;
 
         Ok(TestEnv {
             abs: abs_client,
@@ -80,6 +78,7 @@ fn successful_install() -> anyhow::Result<()> {
     );
     let holding = app.holding(env.abs.sender().to_string())?;
     assert_eq!(holding.amount, Uint128::one());
+    assert_eq!(issuer.issuer_fee_collector, app.account().owner()?);
 
     Ok(())
 }
@@ -97,7 +96,7 @@ fn failed_buy_key() -> anyhow::Result<()> {
 
     let mock_env = abs.environment();
 
-    let simulation_buy_resp = app.simulate_buy_key(Uint128::from(buy_amount))?;
+    let buy_cost_resp = app.buy_key_cost(Uint128::from(buy_amount))?;
 
     let buyer_addr = &mock_env.addr_make(USER1);
 
@@ -112,7 +111,7 @@ fn failed_buy_key() -> anyhow::Result<()> {
     assert_eq!(
         err,
         FriendTechAppError::InsufficientFunds {
-            required: simulation_buy_resp.total_cost,
+            required: buy_cost_resp.total_cost,
             paid: Uint128::one(),
         }
     );
@@ -133,18 +132,18 @@ fn successful_buy_key() -> anyhow::Result<()> {
 
     let mock_env = abs.environment();
 
-    let simulation_buy_resp = app.simulate_buy_key(Uint128::from(buy_amount))?;
+    let buy_cost_resp = app.buy_key_cost(Uint128::from(buy_amount))?;
 
     let buyer_addr = &mock_env.addr_make(USER1);
 
     mock_env.set_balance(
         buyer_addr,
-        coins(simulation_buy_resp.total_cost.u128(), fee_denom),
+        coins(buy_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
     app.call_as(buyer_addr).buy_key(
         Uint128::from(buy_amount),
-        &coins(simulation_buy_resp.total_cost.u128(), fee_denom),
+        &coins(buy_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
     assert_eq!(
@@ -153,11 +152,11 @@ fn successful_buy_key() -> anyhow::Result<()> {
     );
     assert_eq!(
         mock_env.query_balance(&issuer.issuer_fee_collector, fee_denom)?,
-        simulation_buy_resp.issuer_fee
+        buy_cost_resp.issuer_fee
     );
     assert_eq!(
         mock_env.query_balance(&app.address()?, fee_denom)?,
-        simulation_buy_resp.price
+        buy_cost_resp.price
     );
 
     let issuer = app.issuer()?;
@@ -191,42 +190,42 @@ fn successful_sell_key() -> anyhow::Result<()> {
 
     let mock_env = abs.environment();
 
-    let simulation_buy_resp = app.simulate_buy_key(Uint128::from(buy_amount))?;
+    let buy_cost_resp = app.buy_key_cost(Uint128::from(buy_amount))?;
 
     let trader_addr = &mock_env.addr_make(USER1);
 
     mock_env.set_balance(
         trader_addr,
-        coins(simulation_buy_resp.total_cost.u128(), fee_denom),
+        coins(buy_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
     app.call_as(trader_addr).buy_key(
         Uint128::from(buy_amount),
-        &coins(simulation_buy_resp.total_cost.u128(), fee_denom),
+        &coins(buy_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
-    let simulation_sell_resp = app.simulate_sell_key(Uint128::from(sell_amount))?;
+    let sell_cost_resp = app.sell_key_cost(Uint128::from(sell_amount))?;
     mock_env.set_balance(
         trader_addr,
-        coins(simulation_sell_resp.total_cost.u128(), fee_denom),
+        coins(sell_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
     app.call_as(trader_addr).sell_key(
         Uint128::from(sell_amount),
-        &coins(simulation_sell_resp.total_cost.u128(), fee_denom),
+        &coins(sell_cost_resp.total_cost.u128(), fee_denom),
     )?;
 
     assert_eq!(
         mock_env.query_balance(trader_addr, fee_denom)?,
-        simulation_sell_resp.price
+        sell_cost_resp.price
     );
     assert_eq!(
         mock_env.query_balance(&issuer.issuer_fee_collector, fee_denom)?,
-        simulation_buy_resp.issuer_fee + simulation_sell_resp.issuer_fee
+        buy_cost_resp.issuer_fee + sell_cost_resp.issuer_fee
     );
     assert_eq!(
         mock_env.query_balance(&app.address()?, fee_denom)?,
-        simulation_buy_resp.price - simulation_sell_resp.price
+        buy_cost_resp.price - sell_cost_resp.price
     );
 
     let issuer = app.issuer()?;

@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InstantiateMsg",
+  "description": "App instantiate message",
+  "type": "object",
+  "required": [
+    "fee_denom",
+    "issuer_fee_collector",
+    "username"
+  ],
+  "properties": {
+    "fee_denom": {
+      "type": "string"
+    },
+    "issuer_fee_collector": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

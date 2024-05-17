@@ -1,9 +1,9 @@
-use super::query::{query_simulate_buy_key, query_simulate_sell_key};
+use super::query::{query_buy_key_cost, query_sell_key_cost};
 use crate::{
     contract::{FriendTechApp, FriendTechAppResult},
     msg::FriendTechAppExecuteMsg,
     state::{CONFIG, HOLDERS, SUPPLY},
-    utils::get_issuer_addr,
+    utils::get_account_owner_addr,
     FriendTechAppError,
 };
 
@@ -18,6 +18,7 @@ pub fn execute_handler(
     app: FriendTechApp,
     msg: FriendTechAppExecuteMsg,
 ) -> FriendTechAppResult {
+    // TODO: verify caller must be an abstract account?
     match msg {
         FriendTechAppExecuteMsg::BuyKey { amount } => buy_key(deps, info, amount, app),
         FriendTechAppExecuteMsg::SellKey { amount } => sell_key(deps, info, amount, app),
@@ -34,10 +35,10 @@ fn buy_key(
     let buyer = &msg_info.sender;
     let config = CONFIG.load(deps.storage)?;
     let paid = must_pay(&msg_info, &config.fee_denom)?;
-    let simulation_resp = query_simulate_buy_key(deps.as_ref(), amount)?;
-    if simulation_resp.total_cost > paid {
+    let cost_resp = query_buy_key_cost(deps.as_ref(), amount)?;
+    if cost_resp.total_cost > paid {
         return Err(crate::FriendTechAppError::InsufficientFunds {
-            required: simulation_resp.total_cost,
+            required: cost_resp.total_cost,
             paid,
         });
     }
@@ -56,10 +57,10 @@ fn buy_key(
         .response("buy_key")
         .add_message(BankMsg::Send {
             to_address: config.issuer_fee_collector.to_string(),
-            amount: coins(simulation_resp.issuer_fee.u128(), config.fee_denom),
+            amount: coins(cost_resp.issuer_fee.u128(), config.fee_denom),
         })
-        .add_attribute("buyer", buyer.to_string())
-        .add_attribute("amount", amount.to_string()))
+        .add_attribute("buyer", buyer)
+        .add_attribute("amount", amount))
 }
 
 /// Anyone can call, sell key issued by the module owner
@@ -69,14 +70,14 @@ fn sell_key(
     amount: Uint128,
     app: FriendTechApp,
 ) -> FriendTechAppResult {
-    let issuer_addr = &get_issuer_addr(deps.as_ref(), &app)?;
+    let issuer_addr = &get_account_owner_addr(deps.as_ref(), &app)?;
     let seller = &msg_info.sender;
     let config = CONFIG.load(deps.storage)?;
     let paid = must_pay(&msg_info, &config.fee_denom)?;
-    let simulation_resp = query_simulate_sell_key(deps.as_ref(), amount)?;
-    if simulation_resp.total_cost > paid {
+    let cost_resp = query_sell_key_cost(deps.as_ref(), amount)?;
+    if cost_resp.total_cost > paid {
         return Err(crate::FriendTechAppError::InsufficientFunds {
-            required: simulation_resp.total_cost,
+            required: cost_resp.total_cost,
             paid,
         });
     }
@@ -114,12 +115,12 @@ fn sell_key(
         .response("sell_key")
         .add_message(BankMsg::Send {
             to_address: config.issuer_fee_collector.to_string(),
-            amount: coins(simulation_resp.issuer_fee.u128(), &config.fee_denom),
+            amount: coins(cost_resp.issuer_fee.u128(), &config.fee_denom),
         })
         .add_message(BankMsg::Send {
             to_address: seller.to_string(),
-            amount: coins(simulation_resp.price.u128(), &config.fee_denom),
+            amount: coins(cost_resp.price.u128(), &config.fee_denom),
         })
-        .add_attribute("seller", seller.to_string())
-        .add_attribute("amount", amount.to_string()))
+        .add_attribute("seller", seller)
+        .add_attribute("amount", amount))
 }
