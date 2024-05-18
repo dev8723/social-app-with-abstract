@@ -1,6 +1,3 @@
-defaults:
-  run:
-    working-directory: ./cosmwasm
 permissions:
   contents: read
 on:
@@ -10,6 +7,9 @@ on:
 name: check
 jobs:
   fmt:
+    defaults:
+      run:
+        working-directory: cosmwasm
     runs-on: ubuntu-latest
     name: stable / fmt
     steps:
@@ -27,6 +27,9 @@ jobs:
       - name: taplo fmt --check
         run: find . -type f -iname "*.toml" -print0 | xargs -0 taplo format --check
   clippy:
+    defaults:
+      run:
+        working-directory: cosmwasm
     runs-on: ubuntu-latest
     name: ${{ matrix.toolchain }} / clippy
     permissions:
@@ -51,6 +54,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features -- -D warnings
   doc:
+    defaults:
+      run:
+        working-directory: cosmwasm
     runs-on: ubuntu-latest
     name: nightly / doc
     steps:
@@ -64,6 +70,9 @@ jobs:
         env:
           RUSTDOCFLAGS: --cfg docsrs
   hack:
+    defaults:
+      run:
+        working-directory: cosmwasm
     runs-on: ubuntu-latest
     name: ubuntu / stable / features
     steps:
@@ -77,6 +86,9 @@ jobs:
       - name: cargo hack
         run: cargo hack --feature-powerset check --lib --tests
   msrv:
+    defaults:
+      run:
+        working-directory: cosmwasm
     runs-on: ubuntu-latest
     # we use a matrix here just because env can't be used in job names
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
