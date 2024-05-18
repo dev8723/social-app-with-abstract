@@ -1,3 +1,6 @@
+defaults:
+  run:
+    working-directory: cosmwasm
 permissions:
   contents: read
 on:
