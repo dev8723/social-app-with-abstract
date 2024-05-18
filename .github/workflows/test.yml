@@ -9,7 +9,7 @@ jobs:
   required:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     name: ubuntu / ${{ matrix.toolchain }}
     strategy:

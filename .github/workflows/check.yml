@@ -9,7 +9,7 @@ jobs:
   fmt:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     name: stable / fmt
     steps:
@@ -29,7 +29,7 @@ jobs:
   clippy:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     name: ${{ matrix.toolchain }} / clippy
     permissions:
@@ -56,7 +56,7 @@ jobs:
   doc:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     name: nightly / doc
     steps:
@@ -72,7 +72,7 @@ jobs:
   hack:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     name: ubuntu / stable / features
     steps:
@@ -88,7 +88,7 @@ jobs:
   msrv:
     defaults:
       run:
-        working-directory: cosmwasm
+        working-directory: ./cosmwasm
     runs-on: ubuntu-latest
     # we use a matrix here just because env can't be used in job names
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
